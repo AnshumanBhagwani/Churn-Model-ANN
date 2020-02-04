@@ -1,13 +1,17 @@
+#libraries
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import tensorflow
 
+
+#dataset importing and splitting
 dataset = pd.read_csv('Churn_Modelling.csv')
 x = dataset.iloc[:, 3:13].values
 y = dataset.iloc[:, 13].values
 
 
+#categorical data
 from sklearn.preprocessing import LabelEncoder,OneHotEncoder
 lex=LabelEncoder()
 x[:,1]=lex.fit_transform(x[:,1])
@@ -15,13 +19,15 @@ lexi = LabelEncoder()
 x[:,2]=lexi.fit_transform(x[:,2])
 ohe=OneHotEncoder(categorical_features = [1])
 x=ohe.fit_transform(x).toarray()
-x=x[:,1:]
+x=x[:,1:]#to avoid dummy variable trap
 
 
+#training and test set
 from sklearn.model_selection import train_test_split
 xtr,xts,ytr,yts = train_test_split(x,y,test_size = 0.2,random_state=0)
 
 
+#scaling of data
 from sklearn.preprocessing import StandardScaler
 sc_x = StandardScaler()
 xtr = sc_x.fit_transform(xtr)
@@ -56,3 +62,9 @@ classifier.fit(xtr, ytr, batch_size=10, epochs=100)
 
 #predictions
 ypred = classifier.predict(xts)
+ypred_yn = (ypred >0.5)
+
+
+#confusion matrix
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(yts,ypred_yn)
